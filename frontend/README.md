@@ -1,73 +1,66 @@
-# React + TypeScript + Vite
+# 🎨 AQMS Frontend — Premium Dark-Tech Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The AQMS dashboard is a high-performance React application built with Next.js, optimized for industrial monitoring with a "Dark-Tech" aesthetic.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 💎 Design System: The "Dark-Tech" Aesthetic
 
-## React Compiler
+The dashboard uses a custom design system focused on "Visual Density" and "System Transparency".
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Custom Canvas Backgrounds
+Every section uses the HTML5 Canvas API for high-performance, non-blocking animations:
+- **NeuralCanvas**: Particle-link physics representing AI processing.
+- **RadarCanvas**: A 360-degree sonar sweep for geographic device location.
+- **GridNetwork**: A pulsing hex/square grid and router network.
 
-## Expanding the ESLint configuration
+### 2. Glassmorphism & UI Layers
+- **Glass-Card**: Semi-transparent backgrounds with `backdrop-blur` and subtle borders.
+- **Data Shimmer**: Animated CSS gradients used as top-borders to indicate "active data pipelines."
+- **Circuitry Motifs**: Background SVG/Icon decorations (Lucide-React) that pulse based on state.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🔧 Technical Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **Framework**: Next.js 14
+- **State Management**: React `useState` + `useEffect` (stateless routing)
+- **Real-time**: `socket.io-client` (Port 5000)
+- **Styling**: Tailwind CSS (Utility-first)
+- **Charts**: Recharts (SVG-based telemetry)
+- **Icons**: Lucide-React
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## 📡 Real-time Socket Synchronization
+
+The frontend subscribes to the following events in a global `useEffect` hook (or per-page hooks):
+
+| Event | Logic |
+|-------|-------|
+| `node_data` | Updates the state of individual sensor cards and moves the charts forward. |
+| `node_status` | Changes the "Live/Offline" indicator color globally. |
+| `critical_alert` | Triggers a top-level alert modal or notification banner. |
+
+### Performance Optimization:
+We use a **Circular Buffer** approach for charts (keeping only the last 20–50 points in memory) to prevent memory leaks during long-running monitoring sessions.
+
+---
+
+## 📂 Key Components
+
+- **`Dashboard.tsx`**: The main overview with the sensor grid.
+- **`MapPage.tsx`**: Radar-style geographic visualization.
+- **`PredictivePage.tsx`**: AI/ML analysis and forecasting view.
+- **`WorkersPage.tsx`**: Individual personnel monitoring with biometric detail modals.
+- **`AnalyticsPage.tsx`**: Deep-dive historical table and aggregation views.
+
+---
+
+## 🛠️ Development
+
+Run the frontend in isolation:
+```bash
+npm run dev
 ```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Note: Ensure the backend is running on `localhost:5000` for Socket.io and API requests to function.

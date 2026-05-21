@@ -1,78 +1,94 @@
-# IoT Air Quality Monitoring System (AQMS)
+# 🌊 AQMS — Air Quality Monitoring System
 
-## 1. System Architecture
-The application is structured into three main components:
-1. **IoT Simulators (Devices)**: Publishes simulated air quality data via MQTT. Located at `simulator.js`.
-2. **Backend Engine (`/backend`)**:
-   - **MQTT Broker**: Integrated `aedes` broker running on port 1883.
-   - **REST API**: Node.js/Express server providing data endpoints.
-   - **Database**: MongoDB for storing real-time data history, user credentials, alerts, and node definitions.
-   - **WebSockets**: `socket.io` bridging MQTT events to the frontend in real-time.
-3. **Frontend Dashboard (`/frontend`)**: Next.js (React), TailwindCSS, Shadcn/ui conventions, Recharts, handling visualization, real-time node monitoring, device control.
+A production-ready Industrial IoT platform for real-time air quality monitoring across distributed sensor nodes, featuring a premium "Dark-Tech" aesthetic and threshold-driven telemetry.
 
 ---
 
-## 2. API Endpoints Documentation
+## 🏛️ System Architecture
 
-### Authentication Base Route: `/api/auth`
-- `POST /register`: Accepts `{ email, password, role }`. Returns JWT token.
-- `POST /login`: Accepts `{ email, password }`. Returns JWT token.
+AQMS is built on a high-concurrency event-driven architecture designed to handle real-time sensor streams with minimal latency.
 
-### Nodes Base Route: `/api/nodes`
-- `GET /`: Returns all registered nodes.
-- `GET /:id`: Returns specific node details.
-- `GET /:id/data?range=24h`: Returns historical time-series data for a node to populate charts.
+```mermaid
+graph TD
+    subgraph "Hardware / Edge"
+        ESP32[ESP32 / Simulator] -- "MQTT (aqms/+/data)" --> Broker[HiveMQ Cloud]
+    end
 
-### Alerts Base Route: `/api/alerts`
-- `GET /`: Returns unread/active system alerts triggered by thresholds.
+    subgraph "Backend (Node.js)"
+        Broker -- "Subscribe" --> Handler[MQTT Handler]
+        Handler -- "Socket.io (node_data)" --> Frontend
+        Handler -- "Threshold Check" --> DB_Check{Critical?}
+        DB_Check -- "Yes" --> PG[(PostgreSQL)]
+        DB_Check -- "Yes" --> Alert[Socket.io: critical_alert]
+        Alert --> Frontend
+    end
+
+    subgraph "Frontend (Next.js)"
+        Frontend[Premium Dashboard] -- "REST API" --> API[Express Routes]
+        API -- "Query" --> PG
+    end
+```
+
+### Core Technologies
+- **Edge**: ESP32 (Physical) / Node.js (Simulator)
+- **Messaging**: MQTT (HiveMQ Public Broker)
+- **Backend**: Node.js (Express) + Socket.io
+- **Database**: PostgreSQL (Relational persistence for critical events)
+- **Frontend**: Next.js 14 + TailwindCSS + Lucide Icons
+- **Aesthetics**: Custom Canvas API for High-Tech backgrounds (Neural, Radar, Pulse)
 
 ---
 
-## 3. Database Schema (MongoDB / Mongoose)
-- **User**: Email, Password Hash, Role (User/Admin), Preferences.
-- **Node**: NodeId, Name, Status, Location, LastSeen, FirmwareVersion.
-- **NodeData** (Time-Series): NodeId, Timestamp, Metrics { aqi, pm1_0, pm2_5, pm10, co, co2, temperature, humidity }.
-- **Alert**: NodeId, Type (Info, Warning, Critical), Message, Timestamp, Resolved.
+## 📜 Detailed Documentation
+
+Visit the links below for a deep dive into each module:
+
+1.  **[System Data Flow](./FLOW.md)**: A detailed breakdown of how data moves from hardware to the UI.
+2.  **[Frontend Architecture](./frontend/README.md)**: Exploration of the "Dark-Tech" UI, React state, and Socket integration.
+3.  **[Backend & API](./backend/README.md)**: Documentation on Express routes, MQTT logic, and DB schema.
 
 ---
 
-## 4. MQTT Integration Setup
-- **Broker**: We implemented `Aedes` inside our Node server on port `1883`. This means no external setup is required, our backend natively understands the MQTT topics.
-- **Data Topic**: `airquality/data/{nodeId}` - Used to stream JSON payloads of AQI metrics.
-- **Status Topic**: `airquality/status/{nodeId}` - Used for LWT (Last Will & Testament) offline/online transitions.
-- **Control**: Dashboard can publish to `airquality/control/{nodeId}` to send remote execution bounds (toggling relays logic implemented in UI).
+## 🚀 Quick Start (Deployment Flow)
 
----
+### 1. Environment Configuration
+Create a `.env` file in the `/backend` directory:
+```env
+DATABASE_URL=postgresql://user:pass@host/dbname
+PORT=5000
+HIVEMQ_URL=mqtt://broker.hivemq.com:1883
+JWT_SECRET=production_secret_key
+```
 
-## 5. Deployment Instructions
+### 2. Launch Sequence
 
-### Prerequisites
-- Node.js > v18 installed
-- MongoDB installed locally or via Atlas (`MONGO_URI`)
-
-### Step 1: Start the Backend & MQTT Broker
-```cmd
+**Terminal 1 (Backend):**
+```bash
 cd backend
 npm install
 npm run dev
 ```
-*(Broker runs on 1883, API and WS run on 5000)*
 
-### Step 2: Start the IoT Nodes Simulator
-In a new terminal:
-```cmd
-node simulator.js
-```
-*(Nodes will begin publishing randomized realistic metric data via MQTT)*
-
-### Step 3: Start the Production Frontend Dashboard
-In a new terminal:
-```cmd
+**Terminal 2 (Frontend):**
+```bash
 cd frontend
 npm install
 npm run dev
 ```
-*(Next.js will compile and serve the dashboard at http://localhost:3000)*
+
+**Terminal 3 (Simulator - Optional):**
+```bash
+cd backend
+node simulator.js
+```
 
 ---
-**Design**: The frontend uses a custom Dark-Mode Industrial Glassmorphism built natively with TailwindCSS variables for a premium, non-generic look.
+
+## 🛡️ Security & Access Control
+- **JWT Authentication**: All sensitive API routes require a valid Bearer token.
+- **Role-Based Access**: Support for `operator` and `admin` roles (expandable).
+- **Encrypted Transmission**: MQTT and Socket.io traffic can be wrapped in SSL/TLS.
+
+---
+
+**Design Philosophy**: AQMS prioritizes **visual density** and **low-latency feedback**. The interface is designed to make operators feel "in control" of a complex industrial environment, using glassmorphism and real-time canvas animations to represent active system monitoring.

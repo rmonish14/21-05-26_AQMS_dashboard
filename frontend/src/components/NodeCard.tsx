@@ -95,70 +95,87 @@ export default function NodeCard({ data, status, history }: NodeCardProps) {
       </div>
 
       {/* ── Body ── */}
-      <div className="px-5 py-4 flex-1 flex flex-col gap-4">
+      <div className="p-5 flex-1 flex flex-col gap-6">
 
-        {/* Primary metrics table */}
-        <div className="grid grid-cols-2 gap-px bg-border rounded-lg overflow-hidden border border-border">
+        {/* Primary metrics table - Fixed alignment */}
+        <div className="grid grid-cols-2 gap-4">
           {[
-            { label: 'PM 2.5', value: data.pm2_5, unit: 'µg/m³' },
-            { label: 'PM 10',  value: data.pm10,  unit: 'µg/m³' },
-            { label: 'CO',     value: data.co,    unit: 'ppm'   },
-            { label: 'CO₂',    value: data.co2,   unit: 'ppm'   },
-          ].map(({ label, value, unit }) => (
-            <div key={label} className="bg-card px-4 py-3">
-              <p className="text-[10px] font-medium text-muted-foreground mb-1">{label}</p>
-              <p className="text-base font-semibold text-foreground tabular-nums font-mono">
-                {value ?? '--'}
-                <span className="text-[10px] font-normal text-muted-foreground ml-1">{unit}</span>
-              </p>
+            { label: 'PM 2.5', value: data.pm2_5, unit: 'µg/m³', color: 'orange' },
+            { label: 'PM 10',  value: data.pm10,  unit: 'µg/m³', color: 'blue' },
+            { label: 'CO',     value: data.co,    unit: 'ppm',   color: 'red' },
+            { label: 'CO₂',    value: data.co2,   unit: 'ppm',   color: 'yellow' },
+          ].map(({ label, value, unit, color }) => (
+            <div key={label} className="relative group">
+              <div className={cn(
+                "absolute inset-0 blur-lg opacity-0 group-hover:opacity-10 transition-opacity rounded-xl",
+                color === 'orange' ? 'bg-orange-500' : color === 'blue' ? 'bg-blue-500' : color === 'red' ? 'bg-red-500' : 'bg-yellow-500'
+              )} />
+              <div className="relative bg-secondary/30 border border-border/50 rounded-xl px-4 py-3 flex flex-col">
+                <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1">{label}</p>
+                <div className="flex items-baseline gap-1">
+                  <p className="text-xl font-bold text-foreground tabular-nums font-mono leading-none">
+                    {value ?? '--'}
+                  </p>
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase">{unit}</span>
+                </div>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Environmental gauges */}
-        <div className="flex justify-around py-2">
-          <GaugeWidget
-            value={data.temperature ?? 0} min={-10} max={50}
-            label="Temperature" unit="°C"
-            colorClass="stroke-orange-400" size={96}
-          />
-          <GaugeWidget
-            value={data.humidity ?? 0} min={0} max={100}
-            label="Humidity" unit="%"
-            colorClass="stroke-blue-400" size={96}
-          />
+        {/* Environmental gauges - Centered Flex */}
+        <div className="flex items-center justify-center gap-8 py-2">
+          <div className="flex flex-col items-center gap-2">
+            <GaugeWidget
+              value={data.temperature ?? 0} min={-10} max={50}
+              label="Temp" unit="°C"
+              colorClass="stroke-orange-400" size={80}
+            />
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <GaugeWidget
+              value={data.humidity ?? 0} min={0} max={100}
+              label="Humid" unit="%"
+              colorClass="stroke-blue-400" size={80}
+            />
+          </div>
         </div>
 
         {/* Trend sparkline */}
-        <div className="border-t border-border pt-3">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[10px] font-medium text-muted-foreground flex items-center gap-1.5">
-              <Activity className="w-3 h-3" /> AQI Trend
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+              <Activity className="w-3.5 h-3.5 text-primary" /> Real-time Trend
             </p>
-            <span className="text-[10px] text-muted-foreground font-mono">2 min</span>
+            <span className="px-2 py-0.5 rounded-full bg-secondary text-[8px] font-bold text-muted-foreground uppercase border border-border">2M Buffer</span>
           </div>
-          <LiveChart
-            data={history}
-            dataKey="aqi"
-            color={aqi > 150 ? 'var(--color-destructive)' : 'var(--color-primary)'}
-          />
+          <div className="h-16 w-full opacity-80 hover:opacity-100 transition-opacity">
+            <LiveChart
+              data={history}
+              dataKey="aqi"
+              color={aqi > 150 ? 'var(--color-destructive)' : 'var(--color-primary)'}
+            />
+          </div>
         </div>
 
-        {/* Relay control */}
-        <div className="flex items-center justify-between pt-1 border-t border-border">
-          <div>
-            <p className="text-xs font-medium text-foreground">Exhaust Fan</p>
-            <p className={cn("text-[10px] mt-0.5", relayActive ? 'text-primary' : 'text-muted-foreground')}>
-              {relayActive ? 'Running' : 'Standby'}
-            </p>
+        {/* Relay control section */}
+        <div className="flex items-center justify-between pt-4 border-t border-border/40">
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-black uppercase tracking-widest text-foreground">Exhaust System</p>
+            <div className="flex items-center gap-1.5">
+              <div className={cn("w-1.5 h-1.5 rounded-full", relayActive ? 'bg-primary animate-pulse' : 'bg-muted-foreground')} />
+              <p className={cn("text-[10px] font-bold", relayActive ? 'text-primary' : 'text-muted-foreground')}>
+                {relayActive ? 'ACTIVE_FLOW' : 'IDLE_STANDBY'}
+              </p>
+            </div>
           </div>
           <button
             onClick={() => setRelayActive(v => !v)}
             disabled={isOffline}
             className={cn(
-              "w-9 h-9 rounded-lg flex items-center justify-center transition-all border",
+              "p-2.5 rounded-xl transition-all border shadow-sm",
               relayActive
-                ? 'bg-primary border-primary text-primary-foreground shadow-sm'
+                ? 'bg-primary border-primary text-primary-foreground shadow-primary/20'
                 : 'bg-secondary border-border text-muted-foreground hover:text-foreground hover:bg-muted',
               isOffline && 'opacity-40 cursor-not-allowed'
             )}
@@ -167,6 +184,7 @@ export default function NodeCard({ data, status, history }: NodeCardProps) {
           </button>
         </div>
       </div>
+
 
       {/* ── Share Modal Overlay ── */}
       {showShare && (
