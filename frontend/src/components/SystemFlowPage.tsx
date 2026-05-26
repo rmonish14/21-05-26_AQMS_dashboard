@@ -96,8 +96,7 @@ function FlowNode({ icon: Icon, label, sub, colorClass, delay = 0, isActive = fa
   return (
     <div className={cn(
         "relative flex flex-col items-center gap-1.5 transition-all duration-700 animate-in fade-in slide-in-from-bottom-4",
-        isActive ? "scale-105" : "opacity-80 scale-100",
-        "animate-[float_6s_ease-in-out_infinite]"
+        isActive ? "scale-105" : "opacity-80 scale-100"
     )} style={{ animationDelay: `${delay}ms` }}>
       <div className={cn(
           "w-12 h-12 rounded-xl flex items-center justify-center border relative overflow-hidden group backdrop-blur-md transition-all duration-500",
@@ -188,7 +187,7 @@ export default function SystemFlowPage() {
       <div className="relative z-10 flex-1 flex flex-col items-center justify-between p-6 overflow-hidden">
         
         {/* Header - Glass Aesthetic */}
-        <div className="text-center space-y-1 animate-[float_8s_ease-in-out_infinite]">
+        <div className="text-center space-y-1">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/40 text-[8px] font-black text-primary uppercase tracking-[0.3em] backdrop-blur-xl shadow-lg animate-pulse">
                 <Sparkles className="w-2.5 h-2.5" /> Synchronized Ecosystem
             </div>
@@ -199,7 +198,7 @@ export default function SystemFlowPage() {
         </div>
 
         {/* Main Flow Diagram */}
-        <div className="w-full flex flex-col items-center justify-center flex-1 min-h-0 py-4 scale-[1.1] sm:scale-100">
+        <div className="w-full flex flex-col items-center justify-center flex-1 min-h-0 py-4 scale-[0.7] sm:scale-[0.85] lg:scale-100 animate-[flowFloat_8s_ease-in-out_infinite]">
             <div className="flex items-center justify-center gap-0 w-full max-w-7xl px-4 relative">
                 
                 {/* Background flow light */}
@@ -219,7 +218,7 @@ export default function SystemFlowPage() {
 
                 {/* 2. EDGE CORE (PIC32 + TFT) */}
                 <div className="flex flex-col items-center gap-8 translate-y-2">
-                     <div className="relative p-0.5 rounded-2xl bg-gradient-to-br from-primary via-primary/30 to-transparent p-[1.5px] shadow-[0_0_40px_rgba(var(--primary-rgb),0.2)] animate-[float_7s_ease-in-out_infinite_1s]">
+                     <div className="relative p-0.5 rounded-2xl bg-gradient-to-br from-primary via-primary/30 to-transparent p-[1.5px] shadow-[0_0_40px_rgba(var(--primary-rgb),0.2)]">
                         <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-20">
                             <span className="text-[7px] font-black text-white bg-primary px-3 py-0.5 rounded-full shadow-lg">CORE_v1.0</span>
                         </div>
@@ -234,7 +233,7 @@ export default function SystemFlowPage() {
                 <DataStream direction="right" label="TX_UART" active={activeStep === 1 || activeStep === 3} />
 
                 {/* 3. COMMUNICATION BRIDGE */}
-                <div className="flex flex-col items-center animate-[float_9s_ease-in-out_infinite_2s]">
+                <div className="flex flex-col items-center">
                     <FlowNode icon={Wifi} label="ESP-01S" sub="WIFI_SERCOM" colorClass="text-blue-400" isActive={activeStep === 3} delay={600} />
                     <div className="h-10 invisible" /> 
                 </div>
@@ -242,7 +241,7 @@ export default function SystemFlowPage() {
                 <DataStream direction="right" label="PUB_MQTT" active={activeStep === 3 || activeStep === 4} />
 
                 {/* 4. CLOUD BROKER */}
-                <div className="flex flex-col items-center animate-[float_6s_ease-in-out_infinite_1.5s]">
+                <div className="flex flex-col items-center">
                     <FlowNode icon={Share2} label="HIVEMQ" sub="TLS_CLOUD" colorClass="text-blue-400" isActive={activeStep === 4} delay={700} />
                     <div className="h-10 invisible" />
                 </div>
@@ -251,7 +250,7 @@ export default function SystemFlowPage() {
 
                 {/* 5. SCADA BACKEND (NODE + DB) */}
                 <div className="flex flex-col items-center gap-8 -translate-y-2">
-                    <div className="animate-[float_10s_ease-in-out_infinite_0.5s]">
+                    <div>
                         <FlowNode icon={Server} label="BACKEND" sub="NODEJS_SCADA" colorClass="text-purple-400" isActive={activeStep === 5} delay={800} />
                     </div>
                     <div className="flex flex-col items-center">
@@ -263,7 +262,7 @@ export default function SystemFlowPage() {
                 <DataStream direction="right" label="WS_PIPE" active={activeStep === 5 || activeStep === 6 || activeStep === 7} />
 
                 {/* 6. FRONTEND MATRIX */}
-                <div className="flex items-center gap-3 p-4 rounded-3xl bg-white/[0.02] border border-white/10 backdrop-blur-2xl shadow-2xl transition-all duration-700 hover:border-primary/40 animate-[float_8s_ease-in-out_infinite_1s]">
+                <div className="flex items-center gap-3 p-4 rounded-3xl bg-white/[0.02] border border-white/10 backdrop-blur-2xl shadow-2xl transition-all duration-700 hover:border-primary/40">
                     <FlowNode icon={Zap} label="SOCKET" sub="PUSH_v2" colorClass="text-yellow-400" isActive={activeStep === 6} delay={900} />
                     <div className="w-6 h-px bg-gradient-to-r from-primary to-cyan-400 opacity-50 shadow-[0_0_10px_rgba(var(--primary-rgb),1)]" />
                     <FlowNode icon={LayoutDashboard} label="DASHBOARD" sub="REACT_WEB" colorClass="text-primary" isActive={activeStep === 7} delay={1000} />
@@ -273,13 +272,13 @@ export default function SystemFlowPage() {
         </div>
 
         {/* Description Grid - Glossy & Floating */}
-        <div className="grid grid-cols-3 gap-6 w-full max-w-6xl pb-4 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl pb-4 mt-8">
             {[
                 { icon: Cpu, title: 'Edge Intelligence', desc: '48MHz PIC32CM running local TinyML inference for zero-latency classification.', color: 'primary' },
                 { icon: Wifi, title: 'Global Telemetry', desc: 'Encrypted MQTT bridge connecting industrial hardware to cloud infrastructure.', color: 'blue-500' },
                 { icon: Sparkles, title: 'Omnichannel Sync', desc: 'Real-time state synchronization across hardware screens and web dashboard.', color: 'purple-500' }
             ].map((card, i) => (
-                <div key={i} className="glass-card group relative p-5 rounded-3xl border border-white/5 bg-white/[0.01] backdrop-blur-3xl hover:bg-white/[0.03] transition-all duration-700 hover:scale-[1.03] hover:border-white/20 overflow-hidden animate-[float_12s_ease-in-out_infinite]" style={{ animationDelay: `${i * 1.5}s` }}>
+                <div key={i} className="glass-card group relative p-5 rounded-3xl border border-white/5 bg-white/[0.01] backdrop-blur-3xl hover:bg-white/[0.03] transition-all duration-700 hover:scale-[1.03] hover:border-white/20 overflow-hidden">
                     <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                     <div className="flex gap-4 items-center">
                         <div className={cn(
@@ -335,6 +334,10 @@ export default function SystemFlowPage() {
             0% { transform: translate(0, -20px); opacity: 0; }
             50% { opacity: 1; }
             100% { transform: translate(0, 20px); opacity: 0; }
+        }
+        @keyframes flowFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
         }
       `}</style>
     </div>

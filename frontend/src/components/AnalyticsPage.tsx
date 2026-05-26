@@ -266,7 +266,7 @@ export default function AnalyticsPage() {
                  <ResponsiveContainer width="100%" height="100%">
                    <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                     <XAxis dataKey="node" {...axisProps} tickFormatter={tick => String(tick).split('-').pop() || String(tick)} />
+                     <XAxis dataKey="node" {...axisProps} tickFormatter={(tick: any) => String(tick).split('-').pop() || String(tick)} />
                      <YAxis dataKey="Count" {...axisProps} allowDecimals={false} />
                      <Tooltip cursor={{ fill: 'rgba(255,255,255,0.03)' }} {...tooltipStyle as any} />
                      <Bar dataKey="Count" radius={[4, 4, 0, 0]}>
@@ -324,7 +324,7 @@ export default function AnalyticsPage() {
                    <Tooltip 
                      cursor={{ strokeDasharray: '3 3' }} 
                      {...tooltipStyle}
-                     content={({ active, payload }) => {
+                     content={({ active, payload }: { active?: boolean, payload?: any[] }) => {
                        if (active && payload && payload.length) {
                          const d = payload[0].payload.raw;
                          return (

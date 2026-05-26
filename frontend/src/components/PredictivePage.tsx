@@ -674,11 +674,11 @@ export default function PredictivePage() {
                     dataKey="timestamp" 
                     stroke="#888888" 
                     fontSize={10} 
-                    tickFormatter={tick => { try { return new Date(tick).toLocaleTimeString(); } catch { return ""; } }}
+                    tickFormatter={(tick: any) => { try { return new Date(tick).toLocaleTimeString(); } catch { return ""; } }}
                     tickLine={false} 
                     axisLine={false} 
                   />
-                  <YAxis stroke="#888888" fontSize={10} tickLine={false} axisLine={false} tickFormatter={v => Math.round(v).toString()} />
+                  <YAxis stroke="#888888" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v: any) => Math.round(v).toString()} />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: 'rgba(0,0,0,0.85)', 
@@ -688,7 +688,7 @@ export default function PredictivePage() {
                       backdropFilter: 'blur(8px)',
                       boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
                     }}
-                    labelFormatter={l => new Date(l).toLocaleTimeString()}
+                    labelFormatter={(l: any) => new Date(l).toLocaleTimeString()}
                     formatter={(val: any) => [val ? Number(val).toFixed(2) : '--', '']}
                   />
                   <Legend wrapperStyle={{ fontSize: '11px', fontFamily: 'monospace' }} />

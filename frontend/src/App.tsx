@@ -20,7 +20,7 @@ import type { SystemAlert } from "./components/AlertFeed";
 import type { DashboardContext, AIAction } from "./components/AIChatBot";
 import {
   LayoutDashboard, Settings, Info, Activity,
-  Sun, Moon, Map, BarChart3, Wind, Bell, Download, Users, LogOut, Database, BrainCircuit, Share2
+  Sun, Moon, Map, BarChart3, Wind, Bell, Download, Users, Database, BrainCircuit, Share2
 } from "lucide-react";
 import { cn } from "./lib/utils";
 
@@ -47,7 +47,7 @@ export default function App() {
       const stored = localStorage.getItem("aqms_session");
       if (stored) return JSON.parse(stored);
     } catch {}
-    return null;
+    return { token: "bypass-token", username: "operator", role: "operator" };
   });
 
   useEffect(() => {
@@ -157,7 +157,7 @@ export default function App() {
         });
         setLiveStatus({
           "alpha-001": { status: "online"  },
-          "beta-002":  { status: "online"  },
+          "beta-002":  { status: "offline" },
           "gamma-003": { status: "offline" },
           "worker_01_john": { status: "online" },
           "worker_02_sarah": { status: "online" },
@@ -249,7 +249,7 @@ export default function App() {
             {isDarkMode ? "Light Mode" : "Dark Mode"}
           </button>
 
-          <div className="flex items-center justify-between px-3 py-2.5 group hover:bg-secondary/50 rounded-xl transition-all mb-1 mx-1">
+          <div className="flex items-center justify-between px-3 py-2.5 hover:bg-secondary/50 rounded-xl transition-all mb-1 mx-1">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
                 <span className="text-[10px] font-bold text-primary uppercase">{session.username.substring(0, 2)}</span>
@@ -259,14 +259,6 @@ export default function App() {
                 <p className="text-[10px] text-muted-foreground mt-0.5 font-mono uppercase truncate">{session.role}</p>
               </div>
             </div>
-            
-            <button 
-              onClick={() => setSession(null)}
-              className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors opacity-0 group-hover:opacity-100"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4 ml-0.5" />
-            </button>
           </div>
         </div>
       </aside>

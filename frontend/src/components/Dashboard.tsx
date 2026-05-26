@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import NodeCard from './NodeCard';
 import type { SystemAlert } from './AlertFeed';
-import { Activity, Radio, AlertTriangle, MonitorPlay, TrendingUp, Wind, Thermometer, Cpu, Zap, CircuitBoard, Network, Gauge, ShieldCheck, Waves } from 'lucide-react';
+import { Activity, Radio, AlertTriangle, TrendingUp, Wind, Thermometer, Cpu, Zap, CircuitBoard, Network, Gauge, ShieldCheck, Waves } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 /* ═══════════════════════════════════════════════════════
@@ -234,14 +234,11 @@ export default function Dashboard({
   const [nodesStatus, setNodesStatus]   = useState<Record<string, any>>({});
   const [nodesHistory, setNodesHistory] = useState<Record<string, any[]>>({});
   const [alerts, setAlerts]             = useState<SystemAlert[]>([]);
-  const [isMockMode, setIsMockMode]     = useState(false);
 
   useEffect(() => {
     const socket = io('http://localhost:5000', { reconnectionAttempts: 3, timeout: 2000 });
 
     socket.on('node_data', (data) => {
-      setIsMockMode(false);
-      
       const formattedData = {
         nodeId:      data.nodeId,
         aqi:         Math.round((data.pm25 ?? 0) * 2.5),
@@ -290,11 +287,9 @@ export default function Dashboard({
     });
 
     const startMockEngine = () => {
-      setIsMockMode(true);
-
       setNodesStatus({
         'alpha-001': { nodeId: 'alpha-001', status: 'online' },
-        'beta-002':  { nodeId: 'beta-002',  status: 'online' },
+        'beta-002':  { nodeId: 'beta-002',  status: 'offline' },
         'gamma-003': { nodeId: 'gamma-003', status: 'offline' },
       });
 
@@ -380,15 +375,7 @@ export default function Dashboard({
       {/* Content layer */}
       <div className="relative z-10 flex-1 flex flex-col overflow-y-auto">
 
-        {/* Mock mode banner */}
-        {isMockMode && (
-          <div className="shrink-0 bg-yellow-500/10 border-b border-yellow-500/20 px-8 py-2.5 flex items-center gap-2.5 backdrop-blur-sm">
-            <MonitorPlay className="w-3.5 h-3.5 text-yellow-600 dark:text-yellow-400 shrink-0" />
-            <p className="text-xs font-medium text-yellow-700 dark:text-yellow-300">
-              Demo Mode — Simulated sensor data. Connect the backend to receive live telemetry.
-            </p>
-          </div>
-        )}
+
 
         {/* ── Header ── */}
         <div className="shrink-0 px-8 pt-6 pb-4">
@@ -504,35 +491,57 @@ export default function Dashboard({
 
         {/* Node Grid */}
         <div className="flex-1 px-8 pb-8">
-          {nodeKeys.length === 0 ? (
-            <div className="h-64 glass-card rounded-xl flex flex-col items-center justify-center gap-3 border border-border/50 backdrop-blur-sm relative overflow-hidden">
-              <DataPipeline isActive={true} />
-              <div className="relative mb-2">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-cyan-500/10 border border-primary/20 flex items-center justify-center">
-                  <Activity className="w-8 h-8 text-primary/60 animate-pulse" />
+          {(() => {
+            const onlineEntries = Object.entries(outdoorNodesData).filter(
+              ([nodeId]) => (nodesStatus[nodeId]?.status || 'online') !== 'offline'
+            );
+            if (onlineEntries.length === 0) {
+              return (
+                <div className="h-64 glass-card rounded-xl flex flex-col items-center justify-center gap-3 border border-border/50 backdrop-blur-sm relative overflow-hidden">
+                  <DataPipeline isActive={true} />
+                  <div className="relative mb-2">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-cyan-500/10 border border-primary/20 flex items-center justify-center">
+                      <Activity className="w-8 h-8 text-primary/60 animate-pulse" />
+                    </div>
+                    <div className="absolute inset-0 animate-spin" style={{ animationDuration: '4s' }}>
+                      <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary/60" />
+                    </div>
+                  </div>
+                  <p className="text-sm font-semibold text-muted-foreground">Scanning for sensor nodes...</p>
+                  <p className="text-[10px] text-muted-foreground font-mono">Awaiting telemetry stream connection</p>
+                  <div className="w-40 h-1.5 rounded-full bg-border/50 overflow-hidden">
+                    <div className="h-full rounded-full bg-gradient-to-r from-primary to-cyan-400 animate-[shimmer_2s_ease-in-out_infinite] w-1/2" />
+                  </div>
                 </div>
-                <div className="absolute inset-0 animate-spin" style={{ animationDuration: '4s' }}>
-                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary/60" />
+              );
+            }
+            if (onlineEntries.length === 1) {
+              const [nodeId, data] = onlineEntries[0];
+              return (
+                <div className="w-full max-w-6xl mx-auto">
+                  <NodeCard
+                    key={nodeId}
+                    data={data}
+                    status={nodesStatus[nodeId] || { status: 'online' }}
+                    history={nodesHistory[nodeId] || []}
+                    variant="horizontal"
+                  />
                 </div>
+              );
+            }
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                {onlineEntries.map(([nodeId, data]) => (
+                  <NodeCard
+                    key={nodeId}
+                    data={data}
+                    status={nodesStatus[nodeId] || { status: 'online' }}
+                    history={nodesHistory[nodeId] || []}
+                  />
+                ))}
               </div>
-              <p className="text-sm font-semibold text-muted-foreground">Scanning for sensor nodes...</p>
-              <p className="text-[10px] text-muted-foreground font-mono">Awaiting telemetry stream connection</p>
-              <div className="w-40 h-1.5 rounded-full bg-border/50 overflow-hidden">
-                <div className="h-full rounded-full bg-gradient-to-r from-primary to-cyan-400 animate-[shimmer_2s_ease-in-out_infinite] w-1/2" />
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-              {Object.entries(outdoorNodesData).map(([nodeId, data]) => (
-                <NodeCard
-                  key={nodeId}
-                  data={data}
-                  status={nodesStatus[nodeId] || { status: 'online' }}
-                  history={nodesHistory[nodeId] || []}
-                />
-              ))}
-            </div>
-          )}
+            );
+          })()}
         </div>
 
         {/* Bottom Status Bar */}
