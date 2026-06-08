@@ -71,14 +71,29 @@ async function handleMessage(topic, message, io) {
     const co2         = parseFloat(payload.co2  ?? 0);
     const temperature = parseFloat(payload.temp ?? payload.temperature ?? 0);
     const humidity    = parseFloat(payload.humidity ?? payload.hum ?? 0);
+    const aqi         = parseInt(payload.aqi ?? Math.round(pm25 * 2.5));
+    const co          = parseFloat(payload.co ?? 0);
+    const o3          = parseFloat(payload.o3 ?? 0);
+    const nh3         = parseFloat(payload.nh3 ?? 0);
 
-    console.log(`[MQTT] 📡 Data from ${deviceId}: PM2.5=${pm25} CO2=${co2} Temp=${temperature} Hum=${humidity}`);
+    console.log(`[MQTT] 📡 Data from ${deviceId}: PM2.5=${pm25} CO2=${co2} Temp=${temperature} Hum=${humidity} AQI=${aqi}`);
 
     // 1. Register / refresh device entry
     await upsertDevice(deviceId);
 
     // 2. Always broadcast live data to the dashboard via Socket.io
-    io.emit('node_data', { nodeId: deviceId, pm25, co2, temperature, humidity, timestamp: new Date().toISOString() });
+    io.emit('node_data', { 
+      nodeId: deviceId, 
+      pm25, 
+      co2, 
+      temperature, 
+      humidity, 
+      aqi, 
+      co, 
+      o3, 
+      nh3, 
+      timestamp: new Date().toISOString() 
+    });
 
     // 3. Threshold check — only persist to PostgreSQL if critical
     const isCritical = pm25 > THRESHOLDS.pm25 || co2 > THRESHOLDS.co2 || temperature > THRESHOLDS.temp;

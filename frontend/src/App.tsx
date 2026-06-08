@@ -123,7 +123,7 @@ export default function App() {
         ...prev,
         [data.nodeId]: {
           nodeId:      data.nodeId,
-          aqi:         Math.round((data.pm25 ?? 0) * 2.5),  // approximate AQI from PM2.5
+          aqi:         data.aqi ?? Math.round((data.pm25 ?? 0) * 2.5),  // real hardware AQI if available
           pm2_5:       data.pm25        ?? 0,
           pm10:        data.pm10        ?? 0,
           co:          data.co          ?? 0,

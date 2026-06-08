@@ -241,7 +241,7 @@ export default function Dashboard({
     socket.on('node_data', (data) => {
       const formattedData = {
         nodeId:      data.nodeId,
-        aqi:         Math.round((data.pm25 ?? 0) * 2.5),
+        aqi:         data.aqi ?? Math.round((data.pm25 ?? 0) * 2.5),
         pm2_5:       data.pm25        ?? 0,
         pm10:        data.pm10        ?? 0,
         co:          data.co          ?? 0,

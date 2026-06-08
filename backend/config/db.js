@@ -3,9 +3,11 @@ const { Pool } = require('pg');
 
 // ── PostgreSQL Connection Pool ────────────────────────────────────────────────
 // Reads DATABASE_URL from environment. Falls back to the Render-hosted DB.
+const isLocal = process.env.DATABASE_URL && (process.env.DATABASE_URL.includes('localhost') || process.env.DATABASE_URL.includes('127.0.0.1') || process.env.DATABASE_URL.includes('5433'));
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
+  ssl: isLocal ? false : {
     rejectUnauthorized: false, // Required for Render-hosted PostgreSQL
   },
   max: 10,               // Maximum number of clients in the pool

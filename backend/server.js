@@ -30,8 +30,7 @@ const PORT = process.env.PORT || 5000;
 initSchema()
   .then(() => console.log('[Server] ✅ DB schema ready'))
   .catch((err) => {
-    console.error('[Server] ❌ Fatal DB error — cannot start:', err.message);
-    process.exit(1);
+    console.error('[Server] ⚠️ Database connection failed. Running in Live-Relay Only mode:', err.message);
   });
 
 // ── API Routes ────────────────────────────────────────────────────────────────
